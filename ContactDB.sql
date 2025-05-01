@@ -10,19 +10,19 @@ DROP TABLE IF EXISTS users;
 -- 2) Users Table
 CREATE TABLE users (
   user_id int,
-  username varchar(80) NOT NULL UNIQUE,
-  password varchar(255) NOT NULL,
-  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  total_contacts INTEGER NOT NULL DEFAULT 0,
+  username varchar(80) UNIQUE,
+  password varchar(255) ,
+  created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+  total_contacts INTEGER DEFAULT 0,
   Primary Key(user_id)
 );
 
 -- 3) Contact Table
 CREATE TABLE contact (
   contact_id int,
-  user_id int NOT NULL,
-  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  user_id int,
+  created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp DEFAULT CURRENT_TIMESTAMP,
   Primary Key(contact_id),
   Foreign Key(user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -30,10 +30,10 @@ CREATE TABLE contact (
 -- 4) Person Table
 CREATE TABLE person (
   person_id int,
-  contact_id int NOT NULL UNIQUE,
-  first_name varchar(80) NOT NULL,
-  last_name  varchar(80) NOT NULL,
-  birth_date  date,
+  contact_id int UNIQUE,
+  first_name varchar(80),
+  last_name  varchar(80),
+  birth_date date,
   Primary Key(person_id),
   Foreign Key(contact_id) REFERENCES contact(contact_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -41,8 +41,8 @@ CREATE TABLE person (
 -- 5) Organization Table
 CREATE TABLE organization (
   org_id int,
-  contact_id int NOT NULL UNIQUE,
-  org_name varchar(80) NOT NULL,
+  contact_id int UNIQUE,
+  org_name varchar(80),
   org_date date,
   industry varchar(80),
   Primary Key(org_id),
@@ -52,8 +52,8 @@ CREATE TABLE organization (
 -- 6) Phone Table
 CREATE TABLE phone (
   phone_id int,
-  contact_id int NOT NULL,
-  phone_number varchar(20) NOT NULL,
+  contact_id int,
+  phone_number varchar(20),
   phone_type varchar(20),
   Primary Key(phone_id),
   Foreign Key(contact_id) REFERENCES contact(contact_id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -62,8 +62,8 @@ CREATE TABLE phone (
 -- 7) Email Table
 CREATE TABLE email (
   email_id int,
-  contact_id int NOT NULL,
-  email_address varchar(80) NOT NULL,
+  contact_id int,
+  email_address varchar(80),
   email_type varchar(20),
   Primary Key(email_id),
   Foreign Key(contact_id) REFERENCES contact(contact_id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -72,10 +72,10 @@ CREATE TABLE email (
 -- 8) Address Table
 CREATE TABLE address (
   address_id int,
-  contact_id int NOT NULL,
-  address_line varchar(255) NOT NULL,
-  city varchar(80) NOT NULL,
-  state varchar(80) NOT NULL,
+  contact_id int,
+  address_line varchar(255),
+  city varchar(80),
+  state varchar(80),
   zip varchar(10),
   Primary Key(address_id),
   Foreign Key(contact_id) REFERENCES contact(contact_id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -84,9 +84,9 @@ CREATE TABLE address (
 -- 9) Note Table
 CREATE TABLE note (
   note_id int,
-  contact_id int NOT NULL,
+  contact_id int,
   content varchar(255),
-  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_at timestamp DEFAULT CURRENT_TIMESTAMP,
   Primary Key(note_id),
   Foreign Key(contact_id) REFERENCES contact(contact_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
