@@ -100,7 +100,7 @@ INSERT INTO person (person_id, contact_id, first_name, last_name, birth_date) VA
 
 INSERT INTO phone (phone_id, contact_id, phone_number, phone_type) VALUES (1, 1, '555-123-4567', 'mobile');
 
-INSERT INTO email (email_id, contact_id, email_address, mail_type) VALUES (1, 1, 'johndoe@example.com', 'personal');
+INSERT INTO email (email_id, contact_id, email_address, email_type) VALUES (1, 1, 'johndoe@example.com', 'personal');
 
 INSERT INTO address (address_id, contact_id, address_line, city, state, zip) VALUES (1, 1, '123 Main St',      'Springfield', 'MO',   '65802');
 
