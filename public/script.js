@@ -1,4 +1,3 @@
-// script.js
 
 document.addEventListener('DOMContentLoaded', () => {
   const page = window.location.pathname.split('/').pop().toLowerCase();
@@ -9,9 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
   else if (page === 'account.html')              initAccountSettings();
 });
 
-// ---------------------------------------
+
 // 1) LOGIN
-// ---------------------------------------
+
 function initLogin() {
   const form = document.querySelector('.login-container form');
   form?.addEventListener('submit', async e => {
@@ -37,9 +36,9 @@ function initLogin() {
   });
 }
 
-// ---------------------------------------
+
 // 2) DASHBOARD
-// ---------------------------------------
+
 async function initDashboard() {
   const user_id = localStorage.getItem('user_id');
   if (!user_id) return window.location = 'login.html';
@@ -112,9 +111,9 @@ async function initDashboard() {
   });
 }
 
-// ---------------------------------------
+
 // 3) ADD CONTACT
-// ---------------------------------------
+
 function initAddContact() {
   const form = document.querySelector('.edit-form');
   const user_id = localStorage.getItem('user_id');
@@ -128,15 +127,15 @@ function initAddContact() {
     if (type === 'person') {
       const first = form['first-name'].value.trim();
       const last  = form['last-name'].value.trim();
-      const bdate = form['birth-date']?.value || null;
+      const byear = form['birth-year']?.value || null;
       if (!first || !last) return alert('First & last required');
-      details = { first_name: first, last_name: last, birth_date: bdate };
+      details = { first_name: first, last_name: last, birth_year: byear };
     } else {
       const orgName = form['org-name'].value.trim();
-      const orgDate = form['org-date']?.value || null;
+      const orgYear = form['org-year']?.value || null;
       const industry= form['industry'].value.trim();
       if (!orgName) return alert('Organization name required');
-      details = { org_name: orgName, org_date: orgDate, industry };
+      details = { org_name: orgName, org_year: orgYear, industry };
     }
     details.phone_number  = document.getElementById('phone-number').value.trim();
     details.phone_type    = document.getElementById('phone-type').value;
@@ -157,10 +156,9 @@ function initAddContact() {
   });
 }
 
-// ---------------------------------------
+
 // 4) EDIT CONTACT
-// ---------------------------------------
-// script.js
+
 async function initEditContact() {
   const params  = new URLSearchParams(window.location.search);
   const id      = params.get('id');
@@ -168,7 +166,7 @@ async function initEditContact() {
   const user_id = localStorage.getItem('user_id');
   if (!form || !id || !user_id) return window.location = 'login.html';
 
-  // 1) Fetch & prefill
+  // prefill
   try {
     const res  = await fetch(`/api/contacts?user_id=${user_id}`);
     if (!res.ok) throw new Error('Fetch failed');
@@ -198,7 +196,7 @@ async function initEditContact() {
     return window.location = 'dashboard.html';
   }
 
-  // 2) On Save, gather & PUT back
+  // 2)save and PUT back
   form.addEventListener('submit', async e => {
     e.preventDefault();
 
@@ -209,10 +207,10 @@ async function initEditContact() {
       const first = form['first-name'].value.trim();
       const last  = form['last-name'].value.trim();
       if (!first || !last) return alert('First & last required');
-      details = { first_name: first, last_name: last, birth_date: null };
+      details = { first_name: first, last_name: last, birth_year: null };
     } else {
-      // if you support Organizations, read those inputs here
-      details = { org_name: '', org_date: null, industry: '' };
+      
+      details = { org_name: '', org_year: null, industry: '' };
     }
 
     // phone & email
@@ -245,17 +243,46 @@ async function initEditContact() {
 }
 
 
-// ---------------------------------------
+
 // 5) ACCOUNT SETTINGS
-// ---------------------------------------
+
 function initAccountSettings() {
   const form = document.querySelector('.edit-form');
   if (!form) return window.location = 'login.html';
 
   form.addEventListener('submit', e => {
     e.preventDefault();
-    // Implement as needed…
     alert('Account settings saved.');
     window.location = 'dashboard.html';
+  });
+}
+
+function initAccountSettings() {
+  const form = document.querySelector('.edit-form');
+  if (!form) return window.location = 'login.html';
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const newPassword = document.getElementById('new-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+
+    try {
+      const res = await fetch('/api/account/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newPassword, confirmPassword }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert(data.message);
+      } else {
+        alert(data.error || 'Failed to change password.');
+      }
+    } catch (error) {
+      console.error('Error changing password:', error);
+      alert('An error occurred while changing password.');
+    }
   });
 }
