@@ -1,0 +1,86 @@
+<!-- HTML file for the add contact page -->
+<!DOCTYPE html>
+<head>
+  <title>Add Contact</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="edit-container">
+    <h2>Add Contact</h2>
+
+    <form class="edit-form">
+      <!-- Adding the first and last name of the contact -->
+      <div class="row">
+        <label for="first-name">First Name:</label>
+        <input type="text" id="first-name" placeholder="____________">
+        <label for="last-name" style="margin-left:2rem;">Last Name:</label>
+        <input type="text" id="last-name" placeholder="____________">
+      </div>
+
+      <!-- Adding the type of contact -->
+      <div class="row">
+        <label for="contact-type">Contact Type:</label>
+        <select id="contact-type">
+          <option>Person</option>
+          <option>Organization</option>
+        </select>
+      </div>
+
+      <!-- Grid and headers for showing Phone, Email, Address, Note -->
+      <div class="grid">
+        <div class="column-header">PHONE</div>
+        <div class="column-header">EMAIL</div>
+        <div class="column-header">ADDRESS</div>
+        <div class="column-header">NOTE</div>
+
+        <!-- Adding phone details -->
+        <div class="field-group">
+          <input type="text" id="phone-number" placeholder="Phone">
+          <select id="phone-type">
+            <option value="mobile">Mobile</option>
+            <option value="home">Home</option>
+          </select>
+        </div>
+        
+
+        <!-- Adding email details -->
+        <div class="field-group">
+          <input type="text" id="email-address" placeholder="Email">
+          <select id="email-type">
+            <option value="personal">Personal</option>
+            <option value="business">Business</option>
+          </select>
+        </div>
+
+        <!-- Adding address details -->
+        <div class="field-group">
+          <input type="text" placeholder="Address: __________">
+          <input type="text" placeholder="City: __________">
+          <input type="text" placeholder="State: __________">
+          
+          <input type="text" placeholder="Zip-code: __________">
+          <select>
+            <option>Type: Home</option>
+            <option>Type: Work</option>
+          </select>
+          <button type="button">Add New</button>
+        </div>
+
+        <!-- Adding note details -->
+        <div class="field-group">
+          <button type="button">Add New</button>
+        </div>
+      </div>
+
+      <!-- To save or cancel the creation of a new contact -->
+      <div class="actions">
+        <button type="submit">Save Contact</button>
+        <button type="button" onclick="window.location.href='dashboard.html'">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

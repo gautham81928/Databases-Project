@@ -1,0 +1,255 @@
+/* Background for all pages */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f0f4f8;  
+  color: #333333;
+}
+
+/* Login panel */
+.login-container {
+  max-width: 400px;
+  margin: 5rem auto;
+  padding: 2rem;
+  background: #e1f5fe;
+  border: 1px solid #81d4fa;  
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+.login-container h1 {
+  margin-bottom: 2rem;
+  font-size: 1.75rem;
+  color: #01579b;
+}
+.login-container label {
+  display: block;
+  text-align: left;
+  margin-bottom: 0.25rem;
+  font-weight: bold;
+}
+.login-container input {
+  width: 100%;
+  padding: 0.6rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  border: 1px solid #90caf9;
+  border-radius: 4px;
+  background: #ffffff;
+}
+.login-container button {
+  padding: 0.6rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  background: #0288d1;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+.login-container button:hover {
+  background: #ff6f61;
+}
+
+/* Navigation bar */
+.navbar {
+  display: flex;
+  background: linear-gradient(90deg, #0288d1, #ff6f61);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+.navbar a {
+  flex: 1;
+  padding: 1rem;
+  text-align: center;
+  text-decoration: none;
+  color: #ffffff;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  transition: background 0.2s;
+}
+.navbar a:last-child {
+  border-right: none;
+}
+.navbar a:hover,
+.navbar a.active {
+  background: rgba(255, 255, 255, 0.2);
+  font-weight: bold;
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #fff8e1;
+  border-bottom: 1px solid #ffe082;
+}
+.toolbar label {
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+.toolbar input[type="text"],
+.toolbar select {
+  padding: 0.4rem;
+  font-size: 1rem;
+  border: 1px solid #ffe082;
+  border-radius: 4px;
+  background: #ffffff;
+}
+
+/* Contacts table */
+.contact-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+.contact-table th,
+.contact-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #b3e5fc;
+  text-align: left;
+}
+.contact-table th {
+  background: #ff6f61;
+  color: #ffffff;
+}
+.contact-table tr:nth-child(even) {
+  background: #ffe0b2;
+}
+.contact-table td .actions {
+  display: flex;
+  gap: 0.5rem;
+}
+.contact-table td .actions button {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: 1px solid #ffcc80;
+  border-radius: 4px;
+  background: #ffca28;
+  color: #333333;
+  transition: background 0.2s;
+}
+.contact-table td .actions button:hover {
+  background: #f4511e;
+  color: #ffffff;
+}
+
+/* Edit form container */
+.edit-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: #e8f5e9;
+  border: 1px solid #a5d6a7;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+.edit-container h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #1b5e20;
+}
+
+/* Edit contact form layout */
+.edit-form .row {
+  display: flex;
+  align-items: center;
+  margin: 0.75rem 0;
+}
+.edit-form .row label {
+  width: 140px;
+  font-weight: bold;
+}
+.edit-form .row input,
+.edit-form .row select {
+  flex: 1;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #a5d6a7;
+  border-radius: 4px;
+  background: #ffffff;
+}
+
+/* Grid fields */
+.edit-form .grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.edit-form .grid .column-header {
+  text-align: center;
+  font-weight: bold;
+  border-bottom: 2px solid #a5d6a7;
+  padding-bottom: 0.5rem;
+  color: #1b5e20;
+}
+.edit-form .grid .field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.edit-form .grid .field-group input,
+.edit-form .grid .field-group select {
+  padding: 0.5rem;
+  font-size: 0.95rem;
+  border: 1px solid #a5d6a7;
+  border-radius: 4px;
+  background: #ffffff;
+}
+
+/* Form actions */
+.edit-form .actions {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+.edit-form .actions button {
+  padding: 0.7rem 2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  background: #1e88e5;
+  color: #ffffff;
+  transition: background 0.2s;
+}
+.edit-form .actions button:hover {
+  background: #ff6f61;
+}
+
+/* Big buttons bar */
+.big-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  background: #fff3e0;
+  border-bottom: 1px solid #ffcc80;
+}
+.big-buttons button {
+  flex: 1;
+  padding: 1rem;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 6px;
+  background: #1e88e5;
+  color: #ffffff;
+  cursor: pointer;
+  transition: transform 0.1s, background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+.big-buttons button:hover {
+  background: #ff6f61;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.big-buttons button.active {
+  background: #ff6f61;
+  font-weight: bold;
+}
+

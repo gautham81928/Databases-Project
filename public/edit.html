@@ -1,0 +1,82 @@
+<!-- HTML file for the edit contact page -->
+<!DOCTYPE html>
+<head>
+  <title>Edit Contact</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="edit-container">
+    <h2>Edit Contact</h2>
+
+    <form class="edit-form">
+      <!-- Editing the first and last names of a contact -->
+      <div class="row">
+        <label for="first-name">First Name:</label>
+        <input type="text" id="first-name" name="first-name" placeholder="____________">
+        <label for="last-name" style="margin-left:2rem;">Last Name:</label>
+        <input type="text" id="last-name" name="last-name" placeholder="____________">
+      </div>
+
+      <!-- Editing the type of contact -->
+      <div class="row">
+        <label for="contact-type">Contact Type:</label>
+        <select id="contact-type" name="contact-type">
+          <option>Person</option>
+          <option>Organization</option>
+        </select>
+      </div>
+
+      <!-- Grid and headers for showing Phone, Email, Address, Note -->
+      <div class="grid">
+        <div class="column-header">PHONE</div>
+        <div class="column-header">EMAIL</div>
+        <div class="column-header">ADDRESS</div>
+        <div class="column-header">NOTE</div>
+
+        <!-- Editing phone details -->
+        <div class="field-group">
+          <input type="text" id="phone-number" name="phone-number" placeholder="Phone">
+          <select id="phone-type" name="phone-type">
+            <option value="mobile">Mobile</option>
+            <option value="home">Home</option>
+          </select>
+        </div>
+
+        <!-- Editing email details -->
+        <div class="field-group">
+          <input type="text" id="email-address" name="email-address" placeholder="Email">
+          <select id="email-type" name="email-type">
+            <option value="personal">Personal</option>
+            <option value="business">Business</option>
+          </select>
+        </div>
+        
+        <!-- Editing address details -->
+        <div class="field-group">
+          <input type="text" placeholder="Address: __________">
+          <input type="text" placeholder="City: __________">
+          <input type="text" placeholder="State: __________">
+          <input type="text" placeholder="Zip-code: __________">
+          <select>
+            <option>Type: Home</option>
+            <option>Type: Work</option>
+          </select>  
+        </div>
+
+        <!-- Editing note details -->
+        <div class="field-group">
+          <button type="button">Add New</button>
+        </div>
+      </div>
+
+      <!-- To save or cancel the edits of a certain contact -->
+      <div class="actions">
+        <button type="submit">Save Changes</button>
+        <button type="button">Cancel</button>
+      </div>
+    </form>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

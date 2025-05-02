@@ -1,3 +1,4 @@
+-- Drop tables to make sure that there is no existing table with the same name
 DROP TABLE IF EXISTS note;
 DROP TABLE IF EXISTS address;
 DROP TABLE IF EXISTS email;
@@ -7,7 +8,7 @@ DROP TABLE IF EXISTS organization;
 DROP TABLE IF EXISTS contact;
 DROP TABLE IF EXISTS users;
 
--- 2) Users Table
+-- Users Table
 CREATE TABLE users (
   user_id int,
   username varchar(80) UNIQUE,
@@ -17,7 +18,7 @@ CREATE TABLE users (
   Primary Key(user_id)
 );
 
--- 3) Contact Table
+-- Contact Table
 CREATE TABLE contact (
   contact_id int,
   user_id int,
@@ -27,7 +28,7 @@ CREATE TABLE contact (
   Foreign Key(user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- 4) Person Table
+-- Person Table
 CREATE TABLE person (
   person_id int,
   contact_id int UNIQUE,
@@ -38,7 +39,7 @@ CREATE TABLE person (
   Foreign Key(contact_id) REFERENCES contact(contact_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- 5) Organization Table
+-- Organization Table
 CREATE TABLE organization (
   org_id int,
   contact_id int UNIQUE,
@@ -49,7 +50,7 @@ CREATE TABLE organization (
   Foreign Key(contact_id) REFERENCES contact(contact_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- 6) Phone Table
+-- Phone Table
 CREATE TABLE phone (
   phone_id int,
   contact_id int,
@@ -59,7 +60,7 @@ CREATE TABLE phone (
   Foreign Key(contact_id) REFERENCES contact(contact_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- 7) Email Table
+-- Email Table
 CREATE TABLE email (
   email_id int,
   contact_id int,
@@ -69,7 +70,7 @@ CREATE TABLE email (
   Foreign Key(contact_id) REFERENCES contact(contact_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- 8) Address Table
+-- Address Table
 CREATE TABLE address (
   address_id int,
   contact_id int,
@@ -81,7 +82,7 @@ CREATE TABLE address (
   Foreign Key(contact_id) REFERENCES contact(contact_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- 9) Note Table
+-- Note Table
 CREATE TABLE note (
   note_id int,
   contact_id int,
@@ -91,7 +92,7 @@ CREATE TABLE note (
   Foreign Key(contact_id) REFERENCES contact(contact_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Example data for debugging purposes
+-- Example data inserted for debugging purposes
 INSERT INTO users (user_id, username, password, created_at, total_contacts) VALUES (1, 'admin', 'admin123', '2025-04-26 00:00:00', 1);
 
 INSERT INTO contact (contact_id, user_id, created_at, updated_at) VALUES (1, 1, '2025-04-26 00:00:00', '2025-04-26 00:00:00');
@@ -102,7 +103,7 @@ INSERT INTO phone (phone_id, contact_id, phone_number, phone_type) VALUES (1, 1,
 
 INSERT INTO email (email_id, contact_id, email_address, email_type) VALUES (1, 1, 'johndoe@example.com', 'personal');
 
-INSERT INTO address (address_id, contact_id, address_line, city, state, zip) VALUES (1, 1, '123 Main St',      'Springfield', 'MO',   '65802');
+INSERT INTO address (address_id, contact_id, address_line, city, state, zip) VALUES (1, 1, '123 Main St', 'Springfield', 'MO', '65802');
 
 INSERT INTO note (note_id, contact_id, content, created_at) VALUES (1, 1, 'Met at S&T event.', '2025-04-26 00:00:00');
 

@@ -1,0 +1,49 @@
+<!-- HTML file for the account page -->
+<!DOCTYPE html>
+<head>
+  <title>Account Settings</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="addcontact.html">Add Contact</a>
+    <a href="account.html" class="active">Account Settings</a>
+    <button type="button" class="logout-button">Logout</button>
+  </nav>
+
+  <div class="edit-container">
+    <h2>Account Settings</h2>
+
+    <form class="edit-form">  <div class="row">
+      <!-- Username -->
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" placeholder="current_username">
+      </div>
+
+      <!-- Create a new password -->
+      <div class="row">
+        <label for="new-password">New Password:</label>
+        <input type="password" id="new-password" name= "new_password" placeholder="Leave this blank to keep the same password">
+      </div>
+
+      <!-- Confirm the new password -->
+      <div class="row">
+        <label for="confirm-password">Confirm Password:</label>
+        <input type="password" id="confirm-password" name="confirm_password" placeholder="Confirm your new password">
+      </div>
+
+      <!-- Actions to save changes to username/password or cancel the changes -->
+      <div class="actions">
+        <button type="submit" onclick="window.location.href='dashboard.html'">Save Changes</button>
+        <button type="button" class="cancel-button" onclick="window.location.href='dashboard.html'"> Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
