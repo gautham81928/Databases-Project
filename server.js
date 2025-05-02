@@ -261,6 +261,22 @@ app.delete('/api/contacts/:id', async (req, res) => {
   res.json({ success: true });
 });
 
+app.get('/api/contacts/count', async (req, res) => {
+    try {
+        const client = await pool.connect();
+        const result = await client.query(
+            'SELECT COUNT(*) AS total_contacts FROM contact'
+        );
+        const count = result.rows[0].total_contacts;
+        client.release();
+        res.json({ totalContacts: count });
+    } catch (err) {
+        console.error('Error getting contact count:', err);
+        res.status(500).json({ error: 'Failed to retrieve contact count' });
+    }
+});
+
+
 app.listen(port, () => {
   console.log(`Server listening on http://localhost:${port}`);
 });

@@ -1,9 +1,31 @@
+console.log('Script file linked');
 document.addEventListener('DOMContentLoaded', () => {
+  
   const page = window.location.pathname.split('/').pop().toLowerCase();
+  const contactCountElement = document.getElementById('contact-count');
+  console.log('Inside DOMContentLoaded - contactCountElement:', contactCountElement);
+  async function displayContactCount() {
+    if (contactCountElement) {
+        try {
+            const res = await fetch('/api/contacts/count');
+            if (!res.ok){
+              throw new Error('Failed to fetch contact count');
+            }
+            const data = await res.json();
+            contactCountElement.textContent = `Total Contacts: ${data.totalContacts}`;
+        } catch (error) {
+            console.error('Error fetching contact count:', error);
+            contactCountElement.textContent = "Error loading count";
+        }
+    } else {
+        console.error('HTML element with ID "contact-count" not found.');
+    }
+}
   if (page === '' || page === 'login.html') {
     initLogin();
   } else if (page === 'dashboard.html') {
-    initDashboard();
+    displayContactCount()
+    initDashboard(displayContactCount);
   } else if (page === 'addcontact.html') {
     initAddContact();
   } else if (page === 'edit.html') {
@@ -30,7 +52,9 @@ function initLogin() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
       });
-      if (!res.ok) throw new Error('Login failed');
+      if (!res.ok){
+        throw new Error('Login failed');
+      }
       const { user_id } = await res.json();
       localStorage.setItem('user_id', user_id);
       window.location = 'dashboard.html';
@@ -42,130 +66,140 @@ function initLogin() {
 
 
 // 2) DASHBOARD
-async function initDashboard() {
+async function initDashboard(updateCountCallback) {
   const user_id = localStorage.getItem('user_id');
   if (!user_id) {
-    window.location = 'login.html';
-    return;
+      window.location = 'login.html';
+      return;
   }
 
-  const tbody  = document.querySelector('.contact-table tbody');
+  const tbody = document.querySelector('.contact-table tbody');
   const search = document.getElementById('search');
-  const sort   = document.getElementById('sort');
+  const sort = document.getElementById('sort');
 
   async function load() {
-    try {
-      const res = await fetch(`/api/contacts?user_id=${user_id}`);
-      if (!res.ok) throw new Error('Fetch failed');
-      const list = await res.json();
-      tbody.innerHTML = '';
-      list.forEach(c => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${c.name}</td>
-          <td>${c.type}</td>
-          <td class="actions">
-            <button data-id="${c.contact_id}" class="edit">Edit</button>
-            <button data-id="${c.contact_id}" class="delete">X</button>
-          </td>
-          <td>${c.phone_number  || ''}</td>
-          <td>${c.email_address || ''}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    } catch (err) {
-      console.error(err);
-      tbody.innerHTML = '<tr><td colspan="5">Error loading.</td></tr>';
-    }
+      try {
+          const res = await fetch(`/api/contacts?user_id=${user_id}`);
+          if (!res.ok){
+            throw new Error('Fetch failed');
+          }
+          const list = await res.json();
+          tbody.innerHTML = '';
+          list.forEach(c => {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+        <td>${c.name}</td>
+        <td>${c.type}</td>
+        <td class="actions">
+          <button data-id="${c.contact_id}" class="edit">Edit</button>
+          <button data-id="${c.contact_id}" class="delete">X</button>
+        </td>
+        <td>${c.phone_number || ''}</td>
+        <td>${c.email_address || ''}</td>
+      `;
+              tbody.appendChild(tr);
+          });
+      } catch (err) {
+          console.error(err);
+          tbody.innerHTML = '<tr><td colspan="5">Error loading.</td></tr>';
+      }
   }
 
   await load();
 
   search?.addEventListener('input', () => {
-    const q = search.value.toLowerCase();
-    tbody.querySelectorAll('tr').forEach(r => {
-      r.style.display = r.cells[0].textContent.toLowerCase().includes(q) ? '' : 'none';
-    });
+      const q = search.value.toLowerCase();
+      tbody.querySelectorAll('tr').forEach(r => {
+          r.style.display = r.cells[0].textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
   });
 
   sort?.addEventListener('change', () => {
-    const asc = sort.value === 'A–Z';
-    Array.from(tbody.rows)
-      .sort((a, b) => {
-        const A = a.cells[0].textContent.trim().toLowerCase();
-        const B = b.cells[0].textContent.trim().toLowerCase();
-        return asc ? A.localeCompare(B) : B.localeCompare(A);
-      })
-      .forEach(r => tbody.appendChild(r));
+      const asc = sort.value === 'A–Z';
+      Array.from(tbody.rows)
+          .sort((a, b) => {
+              const A = a.cells[0].textContent.trim().toLowerCase();
+              const B = b.cells[0].textContent.trim().toLowerCase();
+              return asc ? A.localeCompare(B) : B.localeCompare(A);
+          })
+          .forEach(r => tbody.appendChild(r));
   });
 
   tbody.addEventListener('click', async e => {
-    if (e.target.tagName !== 'BUTTON') return;
+      if (e.target.tagName !== 'BUTTON') return;
 
-    const id = e.target.dataset.id;
-    if (e.target.classList.contains('edit')) {
-      window.location = `edit.html?id=${id}`;
-    } else if (e.target.classList.contains('delete')) {
-      if (!confirm('Delete this contact?')) return;
-      const res = await fetch(`/api/contacts/${id}`, { method: 'DELETE' });
-      if (!res.ok) return alert('Delete failed');
-      e.target.closest('tr').remove();
-    }
+      const id = e.target.dataset.id;
+      if (e.target.classList.contains('edit')) {
+          window.location = `edit.html?id=${id}`;
+      } else if (e.target.classList.contains('delete')) {
+          if (!confirm('Delete this contact?')){
+             return;
+          }
+          const res = await fetch(`/api/contacts/${id}`, { method: 'DELETE' });
+          if (!res.ok){
+            return alert('Delete failed');
+          }
+          e.target.closest('tr').remove();
+          updateCountCallback?.(); // Call the callback to update the count
+      }
   });
 }
 
 
 // 3) ADD CONTACT
-function initAddContact() {
+function initAddContact(updateCountCallback) {
   console.log('⚡ initAddContact() hooked up');
 
-  const form    = document.querySelector('.edit-form');
+  const form = document.querySelector('.edit-form');
   const user_id = localStorage.getItem('user_id');
   if (!form || !user_id) {
-    window.location = 'login.html';
-    return;
+      window.location = 'login.html';
+      return;
   }
 
   form.addEventListener('submit', async e => {
-    e.preventDefault();
-    const type = document.getElementById('contact-type').value.toLowerCase();
-    let details = {};
+      e.preventDefault();
+      const type = document.getElementById('contact-type').value.toLowerCase();
+      let details = {};
 
-    if (type === 'person') {
-      const first = form['first-name'].value.trim();
-      const last  = form['last-name'].value.trim();
-      const byear = form['birth-year']?.value || null;
-      if (!first || !last) {
-        return alert('First & last required');
+      if (type === 'person') {
+          const first = form['first-name'].value.trim();
+          const last = form['last-name'].value.trim();
+          const byear = form['birth-year']?.value || null;
+          if (!first || !last) {
+              return alert('First & last required');
+          }
+          details = { first_name: first, last_name: last, birth_year: byear };
+      } else {
+          const orgName = form['org-name'].value.trim();
+          const orgYear = form['org-year']?.value || null;
+          const industry = form['industry'].value.trim();
+          if (!orgName) {
+              return alert('Organization name required');
+          }
+          details = { org_name: orgName, org_year: orgYear, industry };
       }
-      details = { first_name: first, last_name: last, birth_year: byear };
-    } else {
-      const orgName  = form['org-name'].value.trim();
-      const orgYear  = form['org-year']?.value || null;
-      const industry = form['industry'].value.trim();
-      if (!orgName) {
-        return alert('Organization name required');
+
+      details.phone_number = document.getElementById('phone-number').value.trim();
+      details.phone_type = document.getElementById('phone-type').value;
+      details.email_address = document.getElementById('email-address').value.trim();
+      details.email_type = document.getElementById('email-type').value;
+
+      try {
+          const res = await fetch('/api/contacts', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ user_id, type, details })
+          });
+          if (!res.ok){
+            throw new Error('Add failed');
+          }
+          alert('Contact added.');
+          window.location = 'dashboard.html';
+          updateCountCallback?.(); // Call the callback to update the count
+      } catch (err) {
+          alert(err.message);
       }
-      details = { org_name: orgName, org_year: orgYear, industry };
-    }
-
-    details.phone_number  = document.getElementById('phone-number').value.trim();
-    details.phone_type    = document.getElementById('phone-type').value;
-    details.email_address = document.getElementById('email-address').value.trim();
-    details.email_type    = document.getElementById('email-type').value;
-
-    try {
-      const res = await fetch('/api/contacts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id, type, details })
-      });
-      if (!res.ok) throw new Error('Add failed');
-      alert('Contact added.');
-      window.location = 'dashboard.html';
-    } catch (err) {
-      alert(err.message);
-    }
   });
 }
 
@@ -184,11 +218,14 @@ async function initEditContact() {
   // Prefill form
   try {
     const res  = await fetch(`/api/contacts?user_id=${user_id}`);
-    if (!res.ok) throw new Error('Fetch failed');
+    if (!res.ok){
+      throw new Error('Fetch failed');
+    }
     const list = await res.json();
     const c    = list.find(x => String(x.contact_id) === id);
-    if (!c) throw new Error('Contact not found');
-
+    if (!c){
+      throw new Error('Contact not found');
+    }
     const [first, ...rest]   = c.name.split(' ');
     form['first-name'].value = first;
     form['last-name'].value  = rest.join(' ');
@@ -213,7 +250,9 @@ async function initEditContact() {
     if (type === 'person') {
       const first = form['first-name'].value.trim();
       const last  = form['last-name'].value.trim();
-      if (!first || !last) return alert('First & last required');
+      if (!first || !last){
+        return alert('First & last required');
+      }
       details = { first_name: first, last_name: last, birth_year: null };
     } else {
       details = { org_name: '', org_year: null, industry: '' };
@@ -230,7 +269,9 @@ async function initEditContact() {
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ type, details })
       });
-      if (!res.ok) throw new Error('Update failed');
+      if (!res.ok){
+        throw new Error('Update failed');
+      }
       alert('Contact updated.');
       window.location = 'dashboard.html';
     } catch (err) {
