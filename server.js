@@ -94,7 +94,7 @@ app.get('/api/contacts', async (req, res) => {
 });
 
 app.post('/api/contacts', async (req, res) => {
-  console.log('POST /api/contacts - req.body:', req.body);
+  
   const { user_id, type, details } = req.body;
   const client = await pool.connect();
   await client.query('BEGIN');
