@@ -39,11 +39,11 @@ app.post('/api/auth/login', async (req, res) => {
 app.post('/api/account/change-password', async (req, res) => {
   const { newPassword, confirmPassword } = req.body;
   if (!newPassword || !confirmPassword) {
-    res.status(400).json({ error: 'New and confirm passwords are required.' });
+    res.status(400).json({ error: 'The new and confirm passwords are required.' });
     return;
   }
   if (newPassword !== confirmPassword) {
-    res.status(400).json({ error: 'New and confirm passwords do not match.' });
+    res.status(400).json({ error: 'The new and confirm passwords do not match.' });
     return;
   }
   CURRENT_PASSWORD = newPassword;

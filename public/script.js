@@ -1,24 +1,24 @@
-console.log('Script file linked');
+
 document.addEventListener('DOMContentLoaded', () => {
   
   const page = window.location.pathname.split('/').pop().toLowerCase();
   const contactCountElement = document.getElementById('contact-count');
-  console.log('Inside DOMContentLoaded - contactCountElement:', contactCountElement);
+ 
   async function displayContactCount() {
     if (contactCountElement) {
         try {
             const res = await fetch('/api/contacts/count');
             if (!res.ok){
-              throw new Error('Failed to fetch contact count');
+              throw new Error('Failed to get contact count');
             }
             const data = await res.json();
             contactCountElement.textContent = `Total Contacts: ${data.totalContacts}`;
         } catch (error) {
-            console.error('Error fetching contact count:', error);
+            console.error('Error getting contact count:', error);
             contactCountElement.textContent = "Error loading count";
         }
     } else {
-        console.error('HTML element with ID "contact-count" not found.');
+        console.error('ID "contact-count" not found.');
     }
 }
   if (page === '' || page === 'login.html') {
@@ -148,7 +148,7 @@ async function initDashboard(updateCountCallback) {
 
 // 3) ADD CONTACT
 function initAddContact(updateCountCallback) {
-  console.log('⚡ initAddContact() hooked up');
+  
 
   const form = document.querySelector('.edit-form');
   const user_id = localStorage.getItem('user_id');
@@ -317,7 +317,7 @@ function initAccountSettings() {
       }
     } catch (error) {
       console.error('Error changing password:', error);
-      alert('An error occurred while changing password.');
+      alert('Error while changing password.');
     }
   });
 }
