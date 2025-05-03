@@ -22,21 +22,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 }
   if (page === '' || page === 'login.html') {
+
     initLogin();
+
   } else if (page === 'dashboard.html') {
+
     displayContactCount()
     initDashboard(displayContactCount);
+
   } else if (page === 'addcontact.html') {
+
     initAddContact();
+
   } else if (page === 'edit.html') {
+
     initEditContact();
+
   } else if (page === 'account.html') {
+
     initAccountSettings();
+
   }
 });
 
 
-// 1) LOGIN
+// Login
 function initLogin() {
   const form = document.querySelector('.login-container form');
   form?.addEventListener('submit', async e => {
@@ -44,6 +54,7 @@ function initLogin() {
     const username = form.username.value.trim();
     const password = form.password.value;
     if (!username || !password) {
+
       return alert('Enter both username and password.');
     }
     try {
@@ -59,13 +70,14 @@ function initLogin() {
       localStorage.setItem('user_id', user_id);
       window.location = 'dashboard.html';
     } catch (err) {
+
       alert(err.message);
     }
   });
 }
 
 
-// 2) DASHBOARD
+// Dashboard
 async function initDashboard(updateCountCallback) {
   const user_id = localStorage.getItem('user_id');
   if (!user_id) {
@@ -81,6 +93,7 @@ async function initDashboard(updateCountCallback) {
       try {
           const res = await fetch(`/api/contacts?user_id=${user_id}`);
           if (!res.ok){
+
             throw new Error('Fetch failed');
           }
           const list = await res.json();
@@ -100,6 +113,7 @@ async function initDashboard(updateCountCallback) {
               tbody.appendChild(tr);
           });
       } catch (err) {
+
           console.error(err);
           tbody.innerHTML = '<tr><td colspan="5">Error loading.</td></tr>';
       }
@@ -108,6 +122,7 @@ async function initDashboard(updateCountCallback) {
   await load();
 
   search?.addEventListener('input', () => {
+
       const q = search.value.toLowerCase();
       tbody.querySelectorAll('tr').forEach(r => {
           r.style.display = r.cells[0].textContent.toLowerCase().includes(q) ? '' : 'none';
@@ -126,27 +141,32 @@ async function initDashboard(updateCountCallback) {
   });
 
   tbody.addEventListener('click', async e => {
-      if (e.target.tagName !== 'BUTTON') return;
+      if (e.target.tagName !== 'BUTTON'){
 
+        return;
+      }
       const id = e.target.dataset.id;
       if (e.target.classList.contains('edit')) {
+
           window.location = `edit.html?id=${id}`;
       } else if (e.target.classList.contains('delete')) {
           if (!confirm('Delete this contact?')){
+
              return;
           }
           const res = await fetch(`/api/contacts/${id}`, { method: 'DELETE' });
           if (!res.ok){
+
             return alert('Delete failed');
           }
           e.target.closest('tr').remove();
-          updateCountCallback?.(); // Call the callback to update the count
+          updateCountCallback?.(); 
       }
   });
 }
 
 
-// 3) ADD CONTACT
+// Add Contact
 function initAddContact(updateCountCallback) {
   
 
@@ -161,6 +181,11 @@ function initAddContact(updateCountCallback) {
       e.preventDefault();
       const type = document.getElementById('contact-type').value.toLowerCase();
       let details = {};
+      const address_line = form['address']?.value.trim() || null;
+    const city = form['city']?.value.trim() || null;
+    const state = form['state']?.value.trim() || null;
+    const zip = form['zip-code']?.value.trim() || null;
+    const address = { address_line, city, state, zip };
 
       if (type === 'person') {
           const first = form['first-name'].value.trim();
@@ -169,7 +194,7 @@ function initAddContact(updateCountCallback) {
           if (!first || !last) {
               return alert('First & last required');
           }
-          details = { first_name: first, last_name: last, birth_year: byear };
+          details = { first_name: first, last_name: last, birth_year: byear, address};
       } else {
           const orgName = form['org-name'].value.trim();
           const orgYear = form['org-year']?.value || null;
@@ -177,7 +202,7 @@ function initAddContact(updateCountCallback) {
           if (!orgName) {
               return alert('Organization name required');
           }
-          details = { org_name: orgName, org_year: orgYear, industry };
+          details = { org_name: orgName, org_year: orgYear, industry, address};
       }
 
       details.phone_number = document.getElementById('phone-number').value.trim();
@@ -192,48 +217,58 @@ function initAddContact(updateCountCallback) {
               body: JSON.stringify({ user_id, type, details })
           });
           if (!res.ok){
+
             throw new Error('Add failed');
           }
           alert('Contact added.');
           window.location = 'dashboard.html';
-          updateCountCallback?.(); // Call the callback to update the count
+          updateCountCallback?.(); 
       } catch (err) {
+
           alert(err.message);
       }
   });
 }
 
 
-// 4) EDIT CONTACT
+// Edit Contact
 async function initEditContact() {
-  const params  = new URLSearchParams(window.location.search);
-  const id      = params.get('id');
-  const form    = document.querySelector('.edit-form');
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  const form = document.querySelector('.edit-form');
   const user_id = localStorage.getItem('user_id');
   if (!form || !id || !user_id) {
+
     window.location = 'login.html';
     return;
   }
 
-  // Prefill form
+  // Load contact details
   try {
-    const res  = await fetch(`/api/contacts?user_id=${user_id}`);
+    const res = await fetch(`/api/contacts?user_id=${user_id}`);
     if (!res.ok){
+      
       throw new Error('Fetch failed');
     }
     const list = await res.json();
-    const c    = list.find(x => String(x.contact_id) === id);
+    const c = list.find(x => String(x.contact_id) === id);
     if (!c){
+
       throw new Error('Contact not found');
     }
-    const [first, ...rest]   = c.name.split(' ');
+    const [first, ...rest] = c.name.split(' ');
     form['first-name'].value = first;
     form['last-name'].value  = rest.join(' ');
-    document.getElementById('contact-type').value  = c.type;
-    document.getElementById('phone-number').value  = c.phone_number  || '';
-    document.getElementById('phone-type').value    = c.phone_type    || 'mobile';
+    document.getElementById('contact-type').value = c.type;
+    document.getElementById('phone-number').value = c.phone_number || '';
+    document.getElementById('phone-type').value = c.phone_type || 'mobile';
     document.getElementById('email-address').value = c.email_address || '';
-    document.getElementById('email-type').value    = c.email_type    || 'personal';
+    document.getElementById('email-type').value = c.email_type || 'personal';
+
+    form['address'].value = c.address?.address_line || '';
+    form['city'].value = c.address?.city || '';
+    form['state'].value = c.address?.state || '';
+    form['zip-code'].value = c.address?.zip || '';
   } catch (err) {
     console.error(err);
     alert('Couldn’t load contact.');
@@ -249,27 +284,33 @@ async function initEditContact() {
 
     if (type === 'person') {
       const first = form['first-name'].value.trim();
-      const last  = form['last-name'].value.trim();
+      const last = form['last-name'].value.trim();
       if (!first || !last){
+
         return alert('First & last required');
       }
+
       details = { first_name: first, last_name: last, birth_year: null };
-    } else {
+    } 
+    else {
+
       details = { org_name: '', org_year: null, industry: '' };
     }
 
-    details.phone_number  = document.getElementById('phone-number').value.trim();
-    details.phone_type    = document.getElementById('phone-type').value;
+    details.phone_number = document.getElementById('phone-number').value.trim();
+    details.phone_type = document.getElementById('phone-type').value;
     details.email_address = document.getElementById('email-address').value.trim();
-    details.email_type    = document.getElementById('email-type').value;
+    details.email_type = document.getElementById('email-type').value;
 
     try {
+
       const res = await fetch(`/api/contacts/${id}`, {
-        method:  'PUT',
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ type, details })
+        body: JSON.stringify({ type, details })
       });
       if (!res.ok){
+
         throw new Error('Update failed');
       }
       alert('Contact updated.');
@@ -289,10 +330,11 @@ async function initEditContact() {
 }
 
 
-// 5) ACCOUNT SETTINGS
+// Account Settings
 function initAccountSettings() {
   const form = document.querySelector('.edit-form');
   if (!form) {
+
     window.location = 'login.html';
     return;
   }
@@ -303,19 +345,22 @@ function initAccountSettings() {
     const confirmPassword = document.getElementById('confirm-password').value;
 
     try {
-      const res  = await fetch('/api/account/change-password', {
+      const res = await fetch('/api/account/change-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ newPassword, confirmPassword }),
       });
       const data = await res.json();
       if (res.ok) {
+
         alert(data.message);
         window.location = 'dashboard.html';
       } else {
+
         alert(data.error || 'Failed to change password.');
       }
     } catch (error) {
+
       console.error('Error changing password:', error);
       alert('Error while changing password.');
     }

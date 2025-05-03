@@ -1,6 +1,6 @@
-const express    = require('express');
+const express = require('express');
 const bodyParser = require('body-parser');
-const { Pool }   = require('pg');
+const { Pool } = require('pg');
 
 const app = express();
 const port = 3000;
@@ -26,12 +26,15 @@ let CURRENT_PASSWORD = PASSWORD;
 app.post('/api/auth/login', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
+
     res.status(400).json({ error: 'Username and password are required.' });
     return;
   }
   if (password === CURRENT_PASSWORD) {
+
     res.json({ user_id: 1 });
-  } else {
+  } 
+  else {
     res.status(401).json({ error: 'Invalid username or password' });
   }
 });
@@ -39,10 +42,12 @@ app.post('/api/auth/login', async (req, res) => {
 app.post('/api/account/change-password', async (req, res) => {
   const { newPassword, confirmPassword } = req.body;
   if (!newPassword || !confirmPassword) {
+
     res.status(400).json({ error: 'The new and confirm passwords are required.' });
     return;
   }
   if (newPassword !== confirmPassword) {
+
     res.status(400).json({ error: 'The new and confirm passwords do not match.' });
     return;
   }
@@ -56,12 +61,12 @@ app.get('/api/contacts', async (req, res) => {
     res.status(400).json({ error: 'Missing user_id' });
     return;
   }
-  const { rows } = await pool.query(
+  const {rows} = await pool.query(
     `SELECT
        c.contact_id,
        CASE
          WHEN p.first_name IS NOT NULL THEN p.first_name || ' ' || p.last_name
-         WHEN o.org_name   IS NOT NULL THEN o.org_name
+         WHEN o.org_name IS NOT NULL THEN o.org_name
          ELSE ''
        END AS name,
        CASE
@@ -70,12 +75,17 @@ app.get('/api/contacts', async (req, res) => {
          ELSE 'Unknown'
        END AS type,
        ph.phone_number,
-       em.email_address
+       em.email_address,
+       a.address_line,
+       a.city,
+       a.state,
+       a.zip
      FROM contact AS c
-     LEFT JOIN person       AS p  ON p.contact_id = c.contact_id
-     LEFT JOIN organization AS o  ON o.contact_id = c.contact_id
-     LEFT JOIN phone        AS ph ON ph.contact_id = c.contact_id
-     LEFT JOIN email        AS em ON em.contact_id = c.contact_id
+     LEFT JOIN person AS p ON p.contact_id = c.contact_id
+     LEFT JOIN organization AS o ON o.contact_id = c.contact_id
+     LEFT JOIN phone AS ph ON ph.contact_id = c.contact_id
+     LEFT JOIN email AS em ON em.contact_id = c.contact_id
+     LEFT JOIN address AS a ON a.contact_id = c.contact_id
      WHERE c.user_id = $1
      ORDER BY name;`,
     [user_id]
@@ -87,9 +97,7 @@ app.post('/api/contacts', async (req, res) => {
   console.log('POST /api/contacts - req.body:', req.body);
   const { user_id, type, details } = req.body;
   const client = await pool.connect();
-
   await client.query('BEGIN');
-
   const cRes = await client.query(`SELECT MAX(contact_id) AS max_id FROM contact;`);
   const nextContactId = (cRes.rows[0].max_id === null ? 1 : cRes.rows[0].max_id + 1);
   await client.query(
@@ -156,6 +164,22 @@ app.post('/api/contacts', async (req, res) => {
       ]
     );
   }
+  if (details.address_line) {
+    const aRes = await client.query(`SELECT MAX(address_id) AS max_id FROM address;`);
+    const nextAddressId = (aRes.rows[0].max_id === null ? 1 : aRes.rows[0].max_id + 1);
+    await client.query(
+      `INSERT INTO address (address_id, contact_id, address_line, city, state, zip)
+       VALUES ($1, $2, $3, $4, $5, $6);`,
+      [
+        nextAddressId,
+        nextContactId,
+        details.address_line,
+        details.city,
+        details.state,
+        details.zip
+      ]
+    );
+  }
 
   await client.query('COMMIT');
   client.release();
@@ -181,7 +205,7 @@ app.put('/api/contacts/:id', async (req, res) => {
     await client.query(
       `UPDATE person
          SET first_name = $2,
-             last_name  = $3,
+             last_name = $3,
              birth_year = $4
        WHERE contact_id = $1;`,
       [
@@ -238,34 +262,51 @@ app.put('/api/contacts/:id', async (req, res) => {
       ]
     );
   }
-
+  await client.query(`DELETE FROM address WHERE contact_id = $1;`, [contact_id]);
+    if (details.address_line) {
+      const aRes = await client.query(`SELECT MAX(address_id) AS max_id FROM address;`);
+      const nextAddressId = (aRes.rows[0].max_id === null ? 1 : aRes.rows[0].max_id + 1);
+      await client.query(
+        `INSERT INTO address (address_id, contact_id, address_line, city, state, zip)
+         VALUES ($1, $2, $3, $4, $5, $6);`,
+        [
+          nextAddressId,
+          contact_id,
+          details.address_line,
+          details.city,
+          details.state,
+          details.zip
+        ]
+      );
+    }
   await client.query('COMMIT');
   client.release();
 
   res.json({ success: true });
+
 });
 
 app.delete('/api/contacts/:id', async (req, res) => {
   const contact_id = req.params.id;
 
   await pool.query('BEGIN');
-  await pool.query('DELETE FROM phone        WHERE contact_id = $1', [contact_id]);
-  await pool.query('DELETE FROM email        WHERE contact_id = $1', [contact_id]);
-  await pool.query('DELETE FROM address      WHERE contact_id = $1', [contact_id]);
-  await pool.query('DELETE FROM note         WHERE contact_id = $1', [contact_id]);
-  await pool.query('DELETE FROM person       WHERE contact_id = $1', [contact_id]);
+  await pool.query('DELETE FROM phone WHERE contact_id = $1', [contact_id]);
+  await pool.query('DELETE FROM email WHERE contact_id = $1', [contact_id]);
+  await pool.query('DELETE FROM address WHERE contact_id = $1', [contact_id]);
+  await pool.query('DELETE FROM note WHERE contact_id = $1', [contact_id]);
+  await pool.query('DELETE FROM person WHERE contact_id = $1', [contact_id]);
   await pool.query('DELETE FROM organization WHERE contact_id = $1', [contact_id]);
-  await pool.query('DELETE FROM contact      WHERE contact_id = $1', [contact_id]);
+  await pool.query('DELETE FROM contact WHERE contact_id = $1', [contact_id]);
   await pool.query('COMMIT');
 
-  res.json({ success: true });
+  res.json({success: true});
 });
 
 app.get('/api/contacts/count', async (req, res) => {
     try {
         const client = await pool.connect();
         const result = await client.query(
-            'SELECT COUNT(*) AS total_contacts FROM contact'
+         'SELECT COUNT(*) AS total_contacts FROM contact'
         );
         const count = result.rows[0].total_contacts;
         client.release();
@@ -278,5 +319,6 @@ app.get('/api/contacts/count', async (req, res) => {
 
 
 app.listen(port, () => {
-  console.log(`Server listening on http://localhost:${port}`);
+
+  console.log(`http://localhost:${port}/login.html`);
 });
